@@ -63,14 +63,17 @@ describe('Basic user flow for Website', () => {
 
     // Grab the shadowRoot of that element (it's a property), then query a button from that shadowRoot.
     let shadowRoot = currElement.shadowRoot;
-    let button = shadowRoot.querySelector('button');
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', async (event) => {
+        let button = shadowRoot.querySelector('button');
+        await page.click(button);
 
-    // Once you have the button, you can click it and check the innerText property of the button.
-    await page.click(button);
-    let text = button.innertext;
-
-    // Once you have the innerText property, use innerText.jsonValue() to get the text value of it
-    let textValue = text.jsonValue();
+        // Once you have the button, you can click it and check the innerText property of the button.
+        let text = button.innertext;
+        // Once you have the innerText property, use innerText.jsonValue() to get the text value of it
+        let textValue = text.jsonValue();
+      });
+    }
   }, 2500);
 
   // Check to make sure that after clicking "Add to Cart" on every <product-item> that the Cart
@@ -85,12 +88,20 @@ describe('Basic user flow for Website', () => {
     for (var i=0; i < selectAll.length; i++) {
       let curr = await selectAll[i];
       let currShadow = curr.shadowRoot;
-      let currButton = currShadow.querySelector('button');
-      await page.click(currButton);
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', async (event) => {
+          let currButton = currShadow.querySelector('button');
+          await page.click(currButton);
+        });
+      }
     }
 
-    // Check to see if the innerText of #cart-count is 20
-    expect(await page.$("#cart-count").innertext).toBe(20);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', async (event) => {
+        // Check to see if the innerText of #cart-count is 20
+        expect(await page.$("#cart-count").innertext).toBe(20);
+      });
+    }
 
   }, 10000);
 
@@ -106,12 +117,20 @@ describe('Basic user flow for Website', () => {
     for (var i=0; i < selectAllReload.length; i++) {
       let currReload = await selectAllReload[i];
       let currShadowReload = currReload.shadowRoot;
-      let currButtonReload = currShadowReload.querySelector('button');
-      expect(currButtonReload.innertext).toBe("Remove from Cart");
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', (event) => {
+          let currButtonReload = currShadowReload.querySelector('button');
+          expect(currButtonReload.innertext).toBe("Remove from Cart");
+        });
+      }
     }    
 
-    // Also check to make sure that #cart-count is still 20
-    expect(await page.$("#cart-count").innertext).toBe(20);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', async (event) => {
+        // Also check to make sure that #cart-count is still 20
+        expect(await page.$("#cart-count").innertext).toBe(20);
+      });
+    }
   }, 10000);
 
   // Check to make sure that the cart in localStorage is what you expect
@@ -119,7 +138,9 @@ describe('Basic user flow for Website', () => {
     // TODO - Step 5
     // At this point he item 'cart' in localStorage should be 
     // '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]', check to make sure it is
-    expect(localStorage.getItem('cart')).tobe("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]");
+    if (typeof window !== 'undefined') {
+      expect(localStorage.getItem('cart')).tobe("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]");
+    }
   });
 
   // Checking to make sure that if you remove all of the items from the cart that the cart
@@ -133,12 +154,20 @@ describe('Basic user flow for Website', () => {
     for (var i=0; i < selectAllReload.length; i++) {
       let currReload = await selectAllReload[i];
       let currShadowReload = currReload.shadowRoot;
-      let currButtonReload = currShadowReload.querySelector('button');
-      await page.click(currButtonReload);
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', (event) => {
+          let currButtonReload = currShadowReload.querySelector('button');
+          page.click(currButtonReload);
+        });
+      }
     }    
 
-    // Once you have, check to make sure that #cart-count is now 0
-    expect(await page.$("#cart-count").innertext).toBe(0);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', async (event) => {
+        // Once you have, check to make sure that #cart-count is now 0
+        expect(await page.$("#cart-count").innertext).toBe(0);
+      });
+    }
 
   }, 10000);
 
@@ -151,15 +180,25 @@ describe('Basic user flow for Website', () => {
     // is in the cart - do this by checking the text on the buttons so that they should say "Add to Cart".
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
    
+    let selectAllReload = await page.$$('product-item');
+
     for (var i=0; i < selectAllReload.length; i++) {
       let currReload = await selectAllReload[i];
       let currShadowReload = currReload.shadowRoot;
-      let currButtonReload = currShadowReload.querySelector('button');
-      expect(currButtonReload.innertext).toBe("Add from Cart");
+      if (typeof window !== 'undefined') {
+        window.addEventListener('load', (event) => {
+          let currButtonReload = currShadowReload.querySelector('button');
+          expect(currButtonReload.innertext).toBe("Add from Cart");
+        });
+      }
     }    
 
-    // Also check to make sure that #cart-count is still 0
-    expect(await page.$("#cart-count").innertext).toBe(0);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('load', async (event) => {
+        // Also check to make sure that #cart-count is still 0
+        expect(await page.$("#cart-count").innertext).toBe(0);
+      });
+    }
   }, 10000);
 
   // Checking to make sure that localStorage for the cart is as we'd expect for the
@@ -168,6 +207,8 @@ describe('Basic user flow for Website', () => {
     console.log('Checking the localStorage...');
     // TODO - Step 8
     // At this point he item 'cart' in localStorage should be '[]', check to make sure it is
-    expect(localStorage.getItem('cart')).tobe("[]");
+    if (typeof window !== 'undefined') {
+      expect(localStorage.getItem('cart')).tobe("[]");
+    }
   });
 });
